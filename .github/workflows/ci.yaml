@@ -42,7 +42,7 @@ jobs:
 
     - name: Run formatter using Prettier
       run: |
-        if ! npm run prettier; then
+        if ! npm run prettier-write; then
           echo "Prettier was unsuccessful"
           exit 1
         else
