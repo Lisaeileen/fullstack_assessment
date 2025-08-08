@@ -1,0 +1,29 @@
+name: PR-checkout
+
+on: 
+  pull_request:
+    branches:
+      - Development 
+      - Staging 
+      - Production
+
+jobs:
+  guard:
+    name: PR-Guard
+
+    runs-on: ubuntu-latest
+
+    steps: 
+    - name: fail if PR is not allowed
+      run: |
+        if [[ "${{ github.base_ref }}" == "Staging" && "${{ github.head_ref }}" != "Development" ]]
+          echo "Error due to pull request not from development"
+          exit 1
+        elif [[ "${{ github.base_ref }}" == "Production" && "${{ github.head_ref }}" != "Staging" ]]
+          echo "Error due to pull request not from Staging"
+          exit 1
+        else [[ "${{ github.base_ref }}" == "Development" && "${{ github.head_ref }}" != "Feature" ]]
+          echo "Error due to pull request not from Feature"
+          exit 1
+        fi
+          echo "Pull Request successful, from right branch"
