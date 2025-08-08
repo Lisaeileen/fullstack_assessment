@@ -16,10 +16,10 @@ jobs:
     steps: 
     - name: fail if PR is not allowed
       run: |
-        if [[ "${{ github.base_ref }}" == "Staging" && "${{ github.head_ref }}" != "Development" ]]
+        if [[ "${{ github.base_ref }}" == "Staging" && "${{ github.head_ref }}" != "Development" ]]; then
           echo "Error due to pull request not from development"
           exit 1
-        elif [[ "${{ github.base_ref }}" == "Production" && "${{ github.head_ref }}" != "Staging" ]]
+        elif [[ "${{ github.base_ref }}" == "Production" && "${{ github.head_ref }}" != "Staging" ]]; then
           echo "Error due to pull request not from Staging"
           exit 1
         else [[ "${{ github.base_ref }}" == "Development" && "${{ github.head_ref }}" != "Feature" ]]
