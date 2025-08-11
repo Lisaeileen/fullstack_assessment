@@ -132,4 +132,6 @@ resource "aws_s3_object" "upload_file" {
   bucket = aws_s3_bucket.fullstack-site-lisa.id
   key    = "index.html" 
   source = "../public/index.html" 
+  content_type = "text/html"
+  etag         = filemd5("./index.html")
 }
