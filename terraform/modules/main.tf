@@ -30,15 +30,23 @@ resource "aws_s3_bucket_versioning" "site-versioning" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "block-public-access" {
+  bucket                  = aws_s3_bucket.fullstack-site-lisa.id
+  block_public_acls       = true
+  ignore_public_acls      = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_website_configuration" "site-lisa-config" {
   bucket = aws_s3_bucket.fullstack-site-lisa.id
 
   index_document {
-    suffix = "public/index.html"
+    suffix = "index.html"
   }
 
   error_document {
-    key = "public/error.html"
+    key = "error.html"
   }
 }
 
@@ -49,28 +57,42 @@ resource "aws_s3_bucket_logging" "log-site-lisa" {
   target_prefix = "website-log-files/"
 }
 
+resource "aws_cloudfront_origin_access_identity" "lisa-oai" {
+  comment = "OAI for private S3"
+}
+
 resource "aws_s3_bucket_policy" "allow_access_to_users" {
   bucket = aws_s3_bucket.fullstack-site-lisa.id
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Effect    = "Allow",
-      Principal = "*",
-      Action    = "s3:GetObject",
-      Resource  = "${aws_s3_bucket.fullstack-site-lisa.arn}/*"
-    }]
+    Statement = [
+      {
+        Sid      = "AllowCloudFrontOAIRead",
+        Effect   = "Allow",
+        Principal = {
+          CanonicalUser = aws_cloudfront_origin_access_identity.lisa-oai.s3_canonical_user_id
+        },
+        Action   = "s3:GetObject",
+        Resource = "${aws_s3_bucket.fullstack-site-lisa.arn}/*"
+      }
+    ]
   })
 }
+
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = aws_s3_bucket.fullstack-site-lisa.bucket_regional_domain_name
     origin_id   = "fullstack.s3_origin_id_${var.lisa-env}"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.lisa-oai.cloudfront_access_identity_path
+    }
   }
 
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "its enabled"
-  default_root_object = "public/index.html"
+  default_root_object = "index.html"
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
