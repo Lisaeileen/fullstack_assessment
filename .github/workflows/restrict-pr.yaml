@@ -22,7 +22,7 @@ jobs:
         elif [[ "${{ github.base_ref }}" == "prod" && "${{ github.head_ref }}" != "stage" ]]; then
           echo "Error due to pull request not from Stage"
           exit 1
-        else [[ "${{ github.base_ref }}" == "dev" && "${{ github.head_ref }}" != "main" ]]
+        elif [[ "${{ github.base_ref }}" == "dev" && "${{ github.head_ref }}" != "main" ]]
           echo "Error due to pull request not from main"
           exit 1
         fi
