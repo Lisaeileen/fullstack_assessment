@@ -49,6 +49,38 @@ resource "aws_s3_bucket_logging" "log-site-lisa" {
   target_prefix = "website-log-files/"
 }
 
+resource "aws_cloudfront_origin_access_identity" "lisa-oai" {
+  comment = "OAI for private S3"
+}
+
+resource "aws_s3_bucket_policy" "allow_access_to_users" {
+  bucket = aws_s3_bucket.fullstack-site-lisa.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid      = "AllowCloudFrontOAIRead",
+        Effect   = "Allow",
+        Principal = {
+          CanonicalUser = aws_cloudfront_origin_access_identity.lisa-oai.s3_canonical_user_id
+        },
+        Action   = "s3:GetObject",
+        Resource = "${aws_s3_bucket.fullstack-site-lisa.arn}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_cloudfront_distribution" "s3_distribution" {
+  origin {
+    domain_name = aws_s3_bucket.fullstack-site-lisa.bucket_regional_domain_name
+    origin_id   = "fullstack.s3_origin_id_${var.lisa-env}"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.lisa-oai.cloudfront_access_identity_path
+    }
+  }
+
 resource "aws_s3_bucket_policy" "allow_access_to_users" {
   bucket = aws_s3_bucket.fullstack-site-lisa.id
   policy = jsonencode({
