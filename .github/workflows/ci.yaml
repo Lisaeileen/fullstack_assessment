@@ -96,9 +96,9 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ./terraform
-        run: terraform plan -var-file="terraform/env/${{ github.ref_name }}.tfvars"
+        run: terraform plan -var-file="env/${{ github.base_ref }}.tfvars"
 
       - name: Terraform Apply
-        if: github.ref_name == 'stage' || github.ref_name == 'prod'
+        if: github.base_ref == 'stage' || github.base_ref == 'prod'
         working-directory: ./terraform
-        run: terraform apply -auto-approve -var-file="terraform/env/${{ github.ref_name }}.tfvars"
+        run: terraform apply -auto-approve -var-file="env/${{ github.base_ref }}.tfvars"
