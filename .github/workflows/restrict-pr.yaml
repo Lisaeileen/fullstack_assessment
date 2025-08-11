@@ -3,9 +3,9 @@ name: PR-checkout
 on: 
   pull_request:
     branches:
-      - Development 
-      - Staging 
-      - Production
+      - dev 
+      - stage
+      - prod
 
 jobs:
   guard:
