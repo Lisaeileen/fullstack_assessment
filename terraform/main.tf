@@ -1,9 +1,22 @@
-# In this file put all the logic to crete the proper infraestructure
 terraform {
-    required_providers {
-        # Add the provideres according to the challenges
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "6.5.0"
     }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
+module "site-modules" {
+  source       = "./modules"
+  region       = var.aws_region
+  lisa-env     = var.lisa-environment
+  lisa-s3-site = var.lisa-s3-bucket-site
+  lisa-s3-logs = var.lisa-s3-bucket-log
 }
 
 
-# Add the resources relatedo to the provider
