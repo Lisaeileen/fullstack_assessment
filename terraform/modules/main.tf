@@ -80,6 +80,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       origin_access_identity = aws_cloudfront_origin_access_identity.lisa-oai.cloudfront_access_identity_path
     }
   }
+}
 
 resource "aws_s3_bucket_policy" "allow_access_to_users" {
   bucket = aws_s3_bucket.fullstack-site-lisa.id
